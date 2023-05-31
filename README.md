@@ -291,9 +291,45 @@ cd ..
 sudo duperemove -dr .
 ```
 
-This ends up consuming a bit of CPU since it is handling deduplication.
+This ends up consuming a bit of CPU since it is scanning files/hashes to determine if the files need to be deduplicated. However, it didn't perform any deduplication on my end. I figured this was due to checksum/block differences. Afterall, we are creating completely separate files rather than copying.
 
-**To Be Continued**
+Therefore, I started reading the manual page for `duperemove` (`man duperemove`). I ended up trying other hashing algorithms which didn't make any differences. I then came across the  `---dedupe-options=[OPTIONS]` flag which is explained below.
+
+```
+--dedupe-options=options
+    Comma separated list of options which alter how we dedupe. Prepend 'no' to an option in order to turn it off.
+
+    [no]partial
+        Duperemove can often find more dedupe by comparing portions of extents to each other. This can be a lengthy, CPU  in‐
+        tensive task so it is turned off by default.
+
+        The  code  behind  this  option is under active development and as a result the semantics of the partial argument may
+        change.
+
+    [no]same
+        Defaults to off. Allow dedupe of extents within the same file.
+
+    [no]fiemap
+        Defaults to on. Duperemove uses the fiemap ioctl during the dedupe stage to optimize out already deduped  extents  as
+        well as to provide an estimate of the space saved after dedupe operations are complete.
+
+        Unfortunately,  some  versions of Btrfs exhibit extremely poor performance in fiemap as the number of references on a
+        file extent goes up. If you are experiencing the dedupe phase slowing down or 'locking up' this option may give you a
+        significant amount of performance back.
+
+        Note: This does not turn off all usage of fiemap, to disable fiemap during the file scan stage, you will also want to
+        use the --lookup-extents=no option.
+
+    [no]block
+        Deprecated.
+```
+
+I ended up using `--dedupe-options partial` which took **a lot** longer to run along with more CPU but performed deduplication.
+
+```bash
+# Run deduplication command with partial option set.
+sudo duperemove --dedupe-options partial -dr .
+``` 
 
 ## Credits
 * [Christian Deacon](https://github.com/gamemann)
