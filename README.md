@@ -102,7 +102,7 @@ LOGO=ubuntu-logo
 ## Partition Table When Installing Ubuntu 23.04
 Here is a screenshot of the VM's partition table/configuration during the Ubuntu installation.
 
-!([Ubuntu Install](./images/ubuntu_install.png))
+![Ubuntu Install](./images/ubuntu_install.png)
 
 For simplicity, I created a single partition for the entire hard drive mounted at `/` (root) which uses BTRFS.
 
