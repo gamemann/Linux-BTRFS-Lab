@@ -159,6 +159,7 @@ dd if=/dev/zero of=filedum1 bs=1G count=15
 
 # Create 10 GBs file.
 dd if=/dev/zero of=filedum2 bs=1G count=10
+
 15+0 records in
 15+0 records out
 16106127360 bytes (16 GB, 15 GiB) copied, 25.2724 s, 637 MB/s
