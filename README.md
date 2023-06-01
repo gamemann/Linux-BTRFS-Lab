@@ -2,7 +2,7 @@
 This is just a small repository to store my results on testing Linux [BTRFS's](https://archive.kernel.org/oldwiki/btrfs.wiki.kernel.org/) out-of-band deduplication [feature](https://btrfs.readthedocs.io/en/latest/Deduplication.html). BTRFS is an advanced Linux file system that comes with many neat features!
 
 ## Motives
-While I'm interested in Linux file systems in general, a gaming community I help out in has a dedicated server running Linux with 512 GBs of disk space utilizing the `ext4` file system that runs multiple CS:GO game servers. CS:GO's base installation files are around ~33 GBs each which resulted in the dedicated server running low on disk space without many **custom** files. Using hard links is an option, but since they utlize [Pterodactyl](https://pterodactyl.io/)/Docker, implementing a hard-link approach would be more difficult since Pterodactyl's mount feature wouldn't work because we'd have hard links on separate file systems which is incompatible. Therefore, since they are buying a new machine soon, I wanted to look into using different Linux file systems that can use compression and/or deduplication to save disk space. I assumed the deduplication feature with file systems such as `BTRFS` would benefit a lot in this situation since the 33 GBs of base installation files for CS:GO are identical.
+While I'm interested in Linux file systems in general, a gaming community I help out in has a dedicated server running Linux with 512 GBs of disk space utilizing the `ext4` file system that runs multiple servers for the game [Counter-Strike: Global Offensive](https://steamdb.info/app/730/charts/). CS:GO's base installation files are around *~33 GBs* each which resulted in the dedicated server running low on disk space without many **custom** game server files. Using hard links is an option, but since they utlize [Pterodactyl](https://pterodactyl.io/)/Docker, implementing a hard-link approach would be more difficult since Pterodactyl's mount feature wouldn't work because we'd have hard links on separate file systems which is incompatible. Therefore, since they are buying a new machine soon, I wanted to look into using different Linux file systems that can utilize compression and/or deduplication to save disk space. I assumed the deduplication feature with file systems such as `BTRFS` would benefit a lot in this situation since the 33 GBs of base installation files for CS:GO are identical.
 
 ## Lab Specs
 * Created on my '[SpyKids](https://github.com/gamemann/Home-Lab#three-spykids)' home server running Ubuntu 22.04.
@@ -171,13 +171,11 @@ dd if=/dev/zero of=filedum2 bs=1G count=10
 10737418240 bytes (11 GB, 10 GiB) copied, 23.9933 s, 448 MB/s
 ```
 
-Now if we execute `ls -lah .`, you can see the size of each file in the test directory.
+Now if we execute `ls -lh .`, you can see the size of each file in the test directory.
 
 ```bash
-christian@sk-btrfstest01:~/test1$ ls -lah .
+christian@sk-btrfstest01:~/test1$ ls -lh .
 total 25G
-drwxrwxr-x 1 christian christian  32 May 31 18:51 .
-drwxr-x--- 1 christian christian 308 May 31 18:51 ..
 -rw-rw-r-- 1 christian christian 15G May 31 18:51 filedum1
 -rw-rw-r-- 1 christian christian 10G May 31 18:52 filedum2
 ```
@@ -195,7 +193,7 @@ tmpfs           390M  172K  390M   1% /run/user/1000
 ```
 
 ## Testing Duplication
-Now, we could copy the directory we just created, but I noticed this automatically handles deduplication due to what the `cp` command does. Therefore, you won't see what it looks like without deduplication.
+Now, we could copy the directory we just created, but I noticed this automatically handles deduplication due to what the `cp` command does behind the scenes. Therefore, you won't see what it looks like without deduplication.
 
 However, if you want a quick example, you may execute the following.
 
@@ -295,11 +293,11 @@ cd ..
 sudo duperemove -dr .
 ```
 
-This ends up consuming a bit of CPU since it is scanning files/hashes to determine if the files need to be deduplicated. However, it didn't perform any deduplication on my end. I figured this was due to checksum/block differences. Afterall, we are creating completely separate files rather than copying.
+This ends up consuming a bit of CPU since it is scanning files/hashes to determine if the files need to be deduplicated. However, it didn't perform any deduplication on my end. I figured this was due to checksum/block differences. Afterall, we are creating completely separate files rather than copying. Though, the contents of the files should be the same (all zero'd bytes).
 
 Therefore, I started reading the manual page for `duperemove` (`man duperemove`). I ended up trying other hashing algorithms which didn't make any differences. I then came across the  `---dedupe-options=[OPTIONS]` flag which is explained below.
 
-```
+```bash
 --dedupe-options=options
     Comma separated list of options which alter how we dedupe. Prepend 'no' to an option in order to turn it off.
 
@@ -328,7 +326,7 @@ Therefore, I started reading the manual page for `duperemove` (`man duperemove`)
         Deprecated.
 ```
 
-I ended up using `--dedupe-options partial` which took **a lot** longer to run along with more CPU but performed deduplication.
+I ended up using `--dedupe-options partial` which took **a lot** longer to run along with more CPU but performed deduplication. However, it did perform solid deduplication.
 
 ```bash
 # Run deduplication command with partial option set.
