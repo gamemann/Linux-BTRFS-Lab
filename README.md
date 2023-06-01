@@ -335,7 +335,7 @@ sudo duperemove --dedupe-options partial -dr .
 
 While this does consume a bit of CPU, you can use the following flags to limit the amount of cores/threads.
 
-```
+```bash
 --io-threads=N
     Use N threads for I/O. This is used by the file hashing and dedupe stages. Default is automatically detected based on number
     of host cpus.
