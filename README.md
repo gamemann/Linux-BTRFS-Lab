@@ -333,7 +333,29 @@ I ended up using `--dedupe-options partial` which took **a lot** longer to run a
 ```bash
 # Run deduplication command with partial option set.
 sudo duperemove --dedupe-options partial -dr .
-``` 
+```
+
+While this does consume a bit of CPU, you can use the following flags to limit the amount of cores/threads.
+
+```
+--io-threads=N
+    Use N threads for I/O. This is used by the file hashing and dedupe stages. Default is automatically detected based on number
+    of host cpus.
+
+--cpu-threads=N
+    Use N threads for CPU bound tasks. This is used by the duplicate extent finding stage.  Default  is  automatically  detected
+    based on number of host cpus.
+
+    Note:  Hyperthreading  can adversely affect performance of the extent finding stage. If duperemove detects an Intel CPU with
+    hyperthreading it will use half the number of cores reported by the system for cpu bound tasks.
+```
+
+## Conclusion
+This was a fun experiment for me because I feel my knowledge with file systems isn't enough and I'll be using the BTRFS file system more in the future along with the deduplication feature. I think it's best to have a cron job run late at night every two weeks or so to perform deduplication with partial support due to how long it takes.
+
+There are other file systems I'm going to also experiment with such as [ZFS](https://en.wikipedia.org/wiki/ZFS) and [XFS](https://en.wikipedia.org/wiki/XFS) which I've heard great things about. With that said, having deduplication in-band sounds like a better approach since it performs deduplication if needed on any write operation. However, this could be costly to the CPU as well, so there are definitely pros to out-of-band deduplication (e.g. being able to pick what directories to perform deduplication on and what times).
+
+One other thing I did want to note is while file systems such as BTRFS have matured a lot over the years, it is stated deduplication still poses a very small risk of data corruption. This is because the deduplication process involves sharing data blocks and any changes to the data block being shared could cause issues. BTRFS does have safeguards for this, though. So make sure to always **back up your files** if you can!
 
 ## Credits
 * [Christian Deacon](https://github.com/gamemann)
