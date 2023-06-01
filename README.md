@@ -110,7 +110,7 @@ Here is a screenshot of the VM's partition table/configuration during the Ubuntu
 For simplicity, I created a single partition for the entire hard drive mounted at `/` (root) which uses BTRFS.
 
 ## Installing Deduplication Tools
-On Ubuntu 23.04, you will want to install deduplication tools using `apt`. You may run the following command to do so.
+There are multiple deduplication tools you can install or build on your system. In this lab, we'll be using [Duperemove](https://github.com/markfasheh/duperemove). For Ubuntu 23.04, you may run the following `apt` command to install Duperemove via package manager.
 
 ```bash
 sudo apt install -y duperemove
