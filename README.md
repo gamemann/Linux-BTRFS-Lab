@@ -1,6 +1,9 @@
 # Linux BTRFS Lab
 This is just a small repository to store my results on testing Linux [BTRFS's](https://archive.kernel.org/oldwiki/btrfs.wiki.kernel.org/) out-of-band deduplication [feature](https://btrfs.readthedocs.io/en/latest/Deduplication.html). BTRFS is an advanced Linux file system that comes with many neat features!
 
+## Motives
+While I'm interested in Linux file systems in general, a gaming community I help out in has a dedicated server running Linux with 512 GBs of disk space utilizing the `ext4` file system that runs multiple CS:GO game servers. CS:GO's base installation files are around ~33 GBs each which resulted in the dedicated server running low on disk space without many **custom** files. Using hard links is an option, but since they utlize [Pterodactyl](https://pterodactyl.io/)/Docker, implementing a hard-link approach would be more difficult since Pterodactyl's mount feature wouldn't work because we'd have hard links on separate file systems which is incompatible. Therefore, since they are buying a new machine soon, I wanted to look into using different Linux file systems that can use compression and/or deduplication to save disk space. I assumed the deduplication feature with file systems such as `BTRFS` would benefit a lot in this situation since the 33 GBs of base installation files for CS:GO are identical.
+
 ## Lab Specs
 * Created on my '[SpyKids](https://github.com/gamemann/Home-Lab#three-spykids)' home server running Ubuntu 22.04.
 * Virtual machine created with KVM/QEMU running Ubuntu 23.04.
